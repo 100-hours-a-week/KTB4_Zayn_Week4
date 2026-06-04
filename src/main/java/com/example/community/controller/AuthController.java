@@ -11,12 +11,12 @@ import java.util.Map;
 @RestController
 public class AuthController { // 로그인, 로그아웃 관련 요청 처리
     @GetMapping("/login")
-    public RequestEntity<Map<String, String>> getLoginForm() {
+    public ResponseEntity<Map<String, String>> getLoginForm() {
         return null;
     }
 
     @PostMapping("/login")
-    public RequestEntity<Map<String, String>> tryLogin() {
+    public ResponseEntity<Map<String, String>> tryLogin() {
         return null;
     }
 
