@@ -7,12 +7,12 @@ import java.util.Map;
 
 @RestController
 public class UserController { // 사용자 정보 관련 요청 처리
-    @GetMapping("join")
+    @GetMapping("/join")
     public ResponseEntity<Map<String, String>> getJoinForm() {
         return null;
     }
 
-    @PostMapping("join")
+    @PostMapping("/join")
     public ResponseEntity<Map<String, String>> tryJoin() {
         return null;
     }
