@@ -52,7 +52,7 @@ public class UserController { // 사용자 정보 관련 요청 처리
     }
 
     @PatchMapping("/me/profile")
-    public ResponseEntity<Map<String, Object>> updateProfile(@RequestBody() UpdateProfileRequestDTO updateProfileRequestDTO) {
+    public ResponseEntity<Map<String, Object>> updateProfile(@Valid @RequestBody() UpdateProfileRequestDTO updateProfileRequestDTO) {
         Map<String, Object> UserInfo = userService.updateProfileProcess(
                 updateProfileRequestDTO.getUserNewNickname(),
                 updateProfileRequestDTO.getUserNewImage()
@@ -75,7 +75,7 @@ public class UserController { // 사용자 정보 관련 요청 처리
     }
 
     @PatchMapping("/me/password")
-    public ResponseEntity<Map<String, Object>> updatePassword(@RequestBody() UpdatePasswordDTO updatePasswordDTO) {
+    public ResponseEntity<Map<String, Object>> updatePassword(@Valid @RequestBody() UpdatePasswordDTO updatePasswordDTO) {
         userService.updatePasswordProcess(updatePasswordDTO);
 
         Map<String, Object> response = new HashMap<>();
