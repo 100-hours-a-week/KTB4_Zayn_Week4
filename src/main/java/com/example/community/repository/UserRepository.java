@@ -66,6 +66,45 @@ public class UserRepository {
         return newUserId;
     }
 
+    public String getUserNicknameByUserId(int userId) {
+        return readUsersJson()
+                .path("users")
+                .path(String.valueOf(userId))
+                .path("user_nickname")
+                .asString();
+    }
+
+    public String getUserEmailByUserId(int userId) {
+        return readUsersJson()
+                .path("users")
+                .path(String.valueOf(userId))
+                .path("user_email")
+                .asString();
+    }
+
+    public String getUserImageByUserId(int userId) {
+        return readUsersJson()
+                .path("users")
+                .path(String.valueOf(userId))
+                .path("user_image")
+                .asString();
+    }
+
+    public String getUserPasswordByUserId(int userId) {
+        return readUsersJson()
+                .path("users")
+                .path(String.valueOf(userId))
+                .path("user_password")
+                .asString();
+    }
+
+    public int getUserIdByUserEmail(String userEmail) {
+        return readUsersJson()
+                .path("user_emails")
+                .path(userEmail)
+                .asInt();
+    }
+
     private JsonNode readUsersJson() {
         return objectMapper.readTree(path.toFile());
     }
