@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -14,7 +15,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final TokenProvider tokenProvider;
 
     public int createPostProcess(CreatePostRequestDTO createPostRequestDTO) {
         return postRepository.save(
@@ -22,6 +22,27 @@ public class PostService {
                 createPostRequestDTO.getPostTitle(),
                 createPostRequestDTO.getPostContent(),
                 createPostRequestDTO.getPostImage()
+        );
+    }
+
+    public Map<String, Object> postsPageLoadProcess(int page) {
+        if (page < 1)
+            throw new IllegalArgumentException("invalid_page");
+
+        List<Map<String, Object>> allPosts = postRepository.findAllOrderByLatest();
+
+        int pageSize = 10;
+        int fromIdx = (page - 1) * pageSize;
+        int toIdx = Math.min(fromIdx + pageSize, allPosts.size());
+
+        List<Map<String, Object>> posts = fromIdx >= allPosts.size()
+                ? List.of()
+                : allPosts.subList(fromIdx, toIdx);
+
+        return Map.of(
+                "posts", posts,
+                "page", page,
+                "posts_count", posts.size()
         );
     }
 

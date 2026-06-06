@@ -15,17 +15,16 @@ import java.util.Map;
 public class PostController { // 게시글 관련 요청 처리
     private final PostService postService;
 
-//    @GetMapping
-//    public ResponseEntity<Map<String, String>> getPosts(@RequestParam int page) {
-//        Map<String, Object> pageInfo = postService.postPageLoadProcess(page);
-//
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("message", "posts_page_load");
-//        response.put("data", null);
-//
-//        return ResponseEntity.ok(response);
-//        return null;
-//    }
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> getPosts(@RequestParam(defaultValue = "1") int page) {
+        Map<String, Object> pageInfo = postService.postsPageLoadProcess(page);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "posts_page_load");
+        response.put("data", pageInfo);
+
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createPost(@RequestBody CreatePostRequestDTO createPostRequestDTO) {

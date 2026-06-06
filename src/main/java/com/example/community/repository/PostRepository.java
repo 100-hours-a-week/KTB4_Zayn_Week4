@@ -9,13 +9,16 @@ import tools.jackson.databind.node.ObjectNode;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
 public class PostRepository {
     private final Path path = Path.of("db/posts.json");
     private final ObjectMapper objectMapper;
+    private final UserRepository userRepository;
 
     public int save(int userId, String title, String content, String postImage) {
         ObjectNode root = (ObjectNode) readUsersJson();
@@ -43,6 +46,33 @@ public class PostRepository {
         objectMapper.writeValue(path.toFile(), root);
 
         return newPostId;
+    }
+
+    public List<Map<String, Object>> findAllOrderByLatest() {
+        JsonNode postsNode = readUsersJson().path("posts");
+
+        List<Map<String, Object>> posts = new ArrayList<>();
+
+        postsNode.properties().forEach(entry -> {
+            JsonNode post = entry.getValue();
+            int writeUserId = post.path("write_user_id").asInt();
+
+            posts.add(Map.of(
+                    "post_id", post.path("post_Id").asInt(),
+                    "post_title", post.path("title").asString(),
+                    "like_count", post.path("like_count").asString(),
+                    "comment_count", post.path("comment_count").asInt(),
+                    "view_count", post.path("view_count").asInt(),
+                    "writer_nickname", userRepository.getUserNicknameByUserId(writeUserId),
+                    "created_at", post.path("created_at").asString()
+            ));
+        });
+
+        posts.sort((p1, p2) ->
+                Integer.compare((int) p2.get("post_id"), (int) p1.get("post_id"))
+        );
+
+        return posts;
     }
 
     private JsonNode readUsersJson() {
