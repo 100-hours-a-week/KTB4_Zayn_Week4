@@ -16,17 +16,27 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
 
-//    public Map<String, Object> loginProcess(LoginRequestDTO loginRequestDTO) {
-//        // 1. db 조회 사용자 ID, 비밀번호 확인
-//        int userId = authenticateUser(loginRequestDTO.getUserEmail(), loginRequestDTO.getUserPassword());
-//
-//        // 2. 액세스 토큰 및 리프래시 토큰 생성
-//        String accessToken = tokenProvider.createAccessToken(userId);
-//        String refreshToken = tokenProvider.createRefreshToken(userId);
-//
-//        // 3. 토큰 + 사용자정보(유저 닉네임, 이메일, 이미지, 아이디) 담은 응답 반환
-//        return null;
-//    }
+    public Map<String, Object> loginProcess(LoginRequestDTO loginRequestDTO) {
+        // 1. db 조회 사용자 ID, 비밀번호 확인
+        int userId = authenticateUser(loginRequestDTO.getUserEmail(), loginRequestDTO.getUserPassword());
+
+        // 2. 액세스 토큰 및 리프래시 토큰 생성
+        String accessToken = tokenProvider.createAccessToken(userId);
+        String refreshToken = tokenProvider.createRefreshToken(userId);
+
+        String userNickname = userRepository.getUserNicknameByUserId(userId);
+        String userEmail = userRepository.getUserEmailByUserId(userId);
+        String userImage = userRepository.getUserImageByUserId(userId);
+
+        // 3. 토큰 + 사용자정보(유저 닉네임, 이메일, 이미지, 아이디) 담은 응답 반환
+        return Map.of(
+                "user_nickname", userNickname,
+                "user_email", userEmail,
+                "user_image", userImage,
+                "access_token", accessToken,
+                "refresh_token", refreshToken
+        );
+    }
 
     public String refreshAccessToken(String authorization) {
         if (authorization == null || !authorization.startsWith("Bearer ")) {
@@ -45,19 +55,19 @@ public class AuthService {
         return tokenProvider.createAccessToken(userId);
     }
 
-//    private int authenticateUser(String userEmail, String userPassword) {
-//        if (!userRepository.existsByUserEmail(userEmail)) {
-//            throw new IllegalArgumentException("user_email_not_found");
-//        }
-//
-//        // 비밀번호 일치 여부
-//        int userId = userRepository.getUserIdByUserEmail(userEmail);
-//        String encodedPassword = userRepository.getUserPasswordByUserId(userId);
-//
-//        if (!passwordEncoder.matches(userPassword, encodedPassword)) {
-//            throw new IllegalArgumentException("password_failed");
-//        }
-//
-//        return userId;
-//    }
+    private int authenticateUser(String userEmail, String userPassword) {
+        if (!userRepository.existsByUserEmail(userEmail)) {
+            throw new IllegalArgumentException("user_email_not_found");
+        }
+
+        // 비밀번호 일치 여부
+        int userId = userRepository.getUserIdByUserEmail(userEmail);
+        String encodedPassword = userRepository.getUserPasswordByUserId(userId);
+
+        if (!passwordEncoder.matches(userPassword, encodedPassword)) {
+            throw new IllegalArgumentException("password_failed");
+        }
+
+        return userId;
+    }
 }
