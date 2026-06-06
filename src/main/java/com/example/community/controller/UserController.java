@@ -87,7 +87,13 @@ public class UserController { // 사용자 정보 관련 요청 처리
     }
 
     @DeleteMapping("/withdraw")
-    public ResponseEntity<Map<String, String>> tryWithdraw() {
-        return null;
+    public ResponseEntity<Map<String, Object>> tryWithdraw() {
+        userService.withdrawProcess();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "user_delete_success");
+        response.put("data", null);
+
+        return ResponseEntity.ok(response);
     }
 }

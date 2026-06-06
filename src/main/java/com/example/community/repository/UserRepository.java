@@ -135,6 +135,18 @@ public class UserRepository {
         objectMapper.writeValue(path.toFile(), root);
     }
 
+    public void removeUserByUserId(int userId) {
+        ObjectNode root = (ObjectNode) readUsersJson();
+        ObjectNode user = (ObjectNode) root
+                .path("users")
+                .path(String.valueOf(userId));
+        user.put("user_nickname", "알 수 없음");
+        user.put("user_email", "");
+        user.put("user_password", "");
+        user.put("user_image", "");
+        objectMapper.writeValue(path.toFile(), root);
+    }
+
     private JsonNode readUsersJson() {
         return objectMapper.readTree(path.toFile());
     }

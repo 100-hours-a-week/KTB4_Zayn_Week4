@@ -63,6 +63,12 @@ public class UserService {
         updateUserPassword(getCurrentUserId(), passwordEncoding(userNewPassword));
     }
 
+    public void withdrawProcess() {
+        // 비밀번호 수정도 그렇고, 사용자 기존 비밀번호 입력 과정이 한 번 더 필요할 것 같음
+        // 일단 기획서 바탕으로 구현
+        userRepository.removeUserByUserId(getCurrentUserId());
+    }
+
     private void duplicatedCheck(String userEmail, String userNickname) {
         if (userRepository.existsByUserEmail(userEmail)) {
             throw new IllegalArgumentException("duplicated_user_email");
