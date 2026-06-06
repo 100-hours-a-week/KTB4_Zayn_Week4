@@ -64,6 +64,7 @@
       "created_at": "2026-06-07 00:00:00",
       "updated_at": null,
       "like_count": 0,
+      "view_count": 0,
       "comment_count": 0,
       "comments_ids": []
     }

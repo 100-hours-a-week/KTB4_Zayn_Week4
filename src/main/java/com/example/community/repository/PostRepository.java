@@ -35,6 +35,7 @@ public class PostRepository {
         newPost.put("created_at", getCurrentDateTime());
         newPost.putNull("updated_at");
         newPost.put("like_count", 0);
+        newPost.put("view_count", 0);
         newPost.put("comment_count", 0);
         newPost.putPOJO("comment_ids", List.of());
 
