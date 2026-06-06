@@ -6,10 +6,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 @RequiredArgsConstructor
@@ -39,6 +42,29 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
+        // 리팩토링 필수
+        if (!authorization.startsWith("Bearer ")) {
+            setUnauthorizedResponse(response);
+            return;
+        }
+
+        String token = authorization.substring(7);
+
+        if (!tokenProvider.validateAccessToken(token)) {
+            setUnauthorizedResponse(response);
+            return;
+        }
+
+        int userId = tokenProvider.getUserId(token);
+
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(
+                        userId,
+                        null,
+                        Collections.emptyList()
+                );
+
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         filterChain.doFilter(request, response);
     }
 
