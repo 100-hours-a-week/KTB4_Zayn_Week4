@@ -39,3 +39,34 @@
   }
 }
 ```
+
+`posts.json` 초기 값
+
+```json
+{
+  "last_post_id": 0,
+  "posts": {}
+}
+```
+
+`posts.json` 예시
+
+```json
+{
+  "last_post_id": 1,
+  "posts": {
+    "1": {
+      "post_id": 1,
+      "write_user_id": 1,
+      "title": "제목",
+      "content": "내용",
+      "post_image": "image.png",
+      "created_at": "2026-06-07 00:00:00",
+      "updated_at": null,
+      "like_count": 0,
+      "comment_count": 0,
+      "comments_ids": []
+    }
+  }
+}
+```
