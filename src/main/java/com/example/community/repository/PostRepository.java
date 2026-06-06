@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.nio.file.Path;
@@ -39,6 +40,7 @@ public class PostRepository {
         newPost.put("created_at", getCurrentDateTime());
         newPost.putNull("updated_at");
         newPost.put("like_count", 0);
+        newPost.putPOJO("like_user_ids", List.of());
         newPost.put("view_count", 0);
         newPost.put("comment_count", 0);
         newPost.putPOJO("comment_ids", List.of());
@@ -163,6 +165,28 @@ public class PostRepository {
                 .path(String.valueOf(postId))
                 .path("post_image")
                 .asString();
+    }
+
+    public void addLike(int postId, int userId) {
+        ObjectNode root = (ObjectNode) readPostsJson();
+        ObjectNode post = (ObjectNode) root
+                .path("posts")
+                .path(String.valueOf(postId));
+
+        ArrayNode likeUserIds = (ArrayNode) post.path("like_user_ids");
+
+        for (JsonNode likeUserId : likeUserIds) {
+            if (likeUserId.asInt() == userId) {
+                throw new IllegalArgumentException("already_liked_post");
+            }
+        }
+
+        likeUserIds.add(userId);
+
+        int likeCount = post.path("like_count").asInt() + 1;
+        post.put("like_count", likeCount);
+
+        objectMapper.writeValue(path.toFile(), root);
     }
 
     private JsonNode readPostsJson() {

@@ -102,6 +102,15 @@ public class PostService {
         return postInfo;
     }
 
+    public void addLikeProcess(int postId) {
+        int userId = getCurrentUserId();
+
+        if (!postRepository.existsByPostId(postId))
+            throw new IllegalArgumentException("post_not_found");
+
+        postRepository.addLike(postId, userId);
+    }
+
     private int getCurrentUserId() {
         Object principal = Objects.requireNonNull(SecurityContextHolder
                         .getContext()

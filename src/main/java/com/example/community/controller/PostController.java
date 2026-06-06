@@ -94,7 +94,15 @@ public class PostController { // 게시글 관련 요청 처리
     }
 
     @PatchMapping("/{post_id}/like")
-    public ResponseEntity<Map<String, String>> addLike(@PathVariable("post_id") Long postId) {
-        return null;
+    public ResponseEntity<Map<String, Object>> addLike(@PathVariable("post_id") int postId) {
+        postService.addLikeProcess(postId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "like_update_success");
+        response.put("data", Map.of(
+                "liked", true,
+                "like_count", 1
+        ));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
