@@ -28,7 +28,7 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/join").permitAll()
+                        .requestMatchers("/login", "/join", "/token").permitAll()
                         .anyRequest().authenticated())
                 .build();
     }

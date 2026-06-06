@@ -29,6 +29,11 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
+        if (isTokenRefreshRequest(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (!hasValidToken(authorization)) {
             setUnauthorizedResponse(response);
             return;
@@ -41,7 +46,7 @@ public class AuthFilter extends OncePerRequestFilter {
         String method = request.getMethod();
         String path = request.getRequestURI();
 
-        return ((method.equals("GET") || method.equals("POST")) // login, join 관련 요청의 경우 true
+        return ((method.equals("GET") || method.equals("POST"))
                 && (path.equals("/login") || path.equals("/join")));
     }
 
@@ -54,6 +59,10 @@ public class AuthFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response); // 유효 토큰이 없는 경우, 필터 종료
+    }
+
+    private boolean isTokenRefreshRequest(HttpServletRequest request) {
+        return request.getMethod().equals("POST") && request.getRequestURI().equals("/token");
     }
 
     private boolean hasValidToken(String authorization) {

@@ -5,10 +5,7 @@ import com.example.community.dto.LoginRequestDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,5 +38,15 @@ public class AuthController { // 로그인, 로그아웃 관련 요청 처리
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> tryLogout() {
         return null;
+    }
+
+    @PostMapping("/token")
+    public ResponseEntity<Map<String, Object>> refreshToken(@RequestHeader("Authorization") String authorization) {
+        String accessToken = authService.refreshAccessToken(authorization);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "access_token_refreshed",
+                "data", accessToken
+        ));
     }
 }
