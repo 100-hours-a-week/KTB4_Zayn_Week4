@@ -177,3 +177,54 @@ public class JWTProvider implements TokenProvider {
 
 <br/>
 
+### 1-6) 토큰 검사 루프 반복
+
+설계에서 `GET /` 요청이 들어오면 토큰 검사를 통해 보유 중이며 유효한 토큰의 소유자일 경우 `/posts` URL을 넘겨주고,<br/>
+토큰이 없거나 유효하지 않은 사용자일 경우 `/login` URL을 넘겨주는 방식으로 설정하였습니다.
+
+하지만 기존 `AuthFilter` 코드의 경우 다음과 같은 로직으로 제작하였습니다.
+
+1. 모든 요청은 Filter의 전처리를 거친다.
+2. 이때 토큰이 없는 사용자는 `/login`으로 리다이렉트하라는 JSON 응답을 보낸다.
+3. 토큰이 있는 사용자는 필터를 통과하여 이후 과정을 거친다. (DispatcherServlet, HandlerMapping, HandlerAdapter, Controller ...)
+
+이러한 과정이 전체적인 API 요청-응답에서 올바르게 작동할지 고민해보았는데, 다음과 같은 상황을 고려해보았을 때 문제가 발생함을 인지하였습니다.
+
+- 토큰이 없는 사용자가 `GET /`한 경우
+  1. 필터에서 토큰이 없기에 `/login`으로 리다이렉트 하라는 JSON 응답
+  2. 클라이언트의 `GET /login` 요청
+  3. 서버에서 토큰이 없기에 `/login`으로 리다이렉트 하라는 JSON 응답
+  4. 반복...
+
+이에 전체 API에서 각각의 토큰 검사에 따른 결과를 분석하였고, 크게 다음 두 가지로 나눌 수 있었습니다.
+
+- 토큰이 유효한 경우, 요청에 맞는 응답 처리
+- 토큰이 유효한 경우, 요청을 무시
+
+대부분의 요청의 경우 사용자의 토큰과 유효성을 검사한 후 통과하면 이후 응답을 위한 로직을 처리하는 과정이었지만<br/>
+`GET /login`, `POST /login`, `GET /join`, `POST /join`의 경우, 토큰이 유효하면 해당 요청 처리를 무시하고, `/posts`로 이동해야했습니다.
+
+따라서 기존 필터의 로직을 다음처럼 변경하였습니다.
+
+1. `GET /login`, `POST /login`, `GET /join`, `POST /join` 요청과 이를 제외한 나머지 요청 두 가지로 구분
+2. 토큰에 대한 필터 검사를 거쳐 구분한 두 경우에 맞게 응답 반환
+
+```java
+...
+        
+if (isAuthPageRequest(request)) {
+    handleAuthPageRequest(authorization, request, response, filterChain);
+    return;
+}
+
+if (!hasValidToken(authorization)) {
+    setUnauthorizedResponse(response);
+    return;
+}
+
+...
+
+```
+
+---
+
