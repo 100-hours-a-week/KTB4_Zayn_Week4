@@ -42,8 +42,14 @@ public class CommentController { // 댓글 관련 요청 처리
     }
 
     @DeleteMapping("/{comment_id}")
-    public ResponseEntity<Map<String, String>> deleteComment(
-            @PathVariable("post_id") Long postId, @PathVariable("comment_id") Long commentId) {
-        return null;
+    public ResponseEntity<Map<String, Object>> deleteComment(
+            @PathVariable("post_id") int postId, @PathVariable("comment_id") int commentId) {
+        commentService.deleteCommentProcess(postId, commentId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "comment_delete_success");
+        response.put("data", null);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

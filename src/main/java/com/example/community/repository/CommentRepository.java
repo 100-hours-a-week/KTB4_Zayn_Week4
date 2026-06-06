@@ -75,6 +75,15 @@ public class CommentRepository {
         objectMapper.writeValue(path.toFile(), root);
     }
 
+    public void removeComment(int commentId) {
+        ObjectNode root = (ObjectNode) readCommentsJson();
+        ObjectNode comments = (ObjectNode) root.path("comments");
+
+        comments.remove(String.valueOf(commentId));
+
+        objectMapper.writeValue(path.toFile(), root);
+    }
+
     private JsonNode readCommentsJson() {
         return objectMapper.readTree(path.toFile());
     }

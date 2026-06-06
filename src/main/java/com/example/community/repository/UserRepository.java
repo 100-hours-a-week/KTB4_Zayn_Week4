@@ -190,6 +190,28 @@ public class UserRepository {
         objectMapper.writeValue(path.toFile(), root);
     }
 
+    public void removeUserCommentId(int userId, int commentId) {
+        ObjectNode root = (ObjectNode) readUsersJson();
+
+        ObjectNode userComments = (ObjectNode) root
+                .path("users")
+                .path(String.valueOf(userId))
+                .path("user_comments");
+
+        ArrayNode newCommentIds = objectMapper.createArrayNode();
+
+        userComments.path("comment_ids").forEach(id -> {
+            if (id.asInt() != commentId) {
+                newCommentIds.add(id.asInt());
+            }
+        });
+
+        userComments.set("comment_ids", newCommentIds);
+        userComments.put("count", newCommentIds.size());
+
+        objectMapper.writeValue(path.toFile(), root);
+    }
+
     private JsonNode readUsersJson() {
         return objectMapper.readTree(path.toFile());
     }

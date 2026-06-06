@@ -56,6 +56,30 @@ public class CommentService {
         );
     }
 
+    public void deleteCommentProcess(int postId, int commentId) {
+        int userId = getCurrentUserId();
+
+        if (!postRepository.existsByPostId(postId)) {
+            throw new IllegalArgumentException("post_not_found");
+        }
+
+        if (!commentRepository.existsByCommentId(commentId)) {
+            throw new IllegalArgumentException("comment_not_found");
+        }
+
+        if (!commentRepository.isCommentInPost(commentId, postId)) {
+            throw new IllegalArgumentException("comment_not_in_post");
+        }
+
+        if (!commentRepository.isCommentWriter(commentId, userId)) {
+            throw new IllegalArgumentException("comment_delete_forbidden");
+        }
+
+        commentRepository.removeComment(commentId);
+        postRepository.removePostCommentId(postId, commentId);
+        userRepository.removeUserCommentId(userId, commentId);
+    }
+
     private int getCurrentUserId() {
         Object principal = Objects.requireNonNull(SecurityContextHolder
                         .getContext()

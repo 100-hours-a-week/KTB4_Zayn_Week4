@@ -205,6 +205,27 @@ public class PostRepository {
         objectMapper.writeValue(path.toFile(), root);
     }
 
+    public void removePostCommentId(int postId, int commentId) {
+        ObjectNode root = (ObjectNode) readPostsJson();
+
+        ObjectNode post = (ObjectNode) root
+                .path("posts")
+                .path(String.valueOf(postId));
+
+        ArrayNode newCommentIds = objectMapper.createArrayNode();
+
+        post.path("comment_ids").forEach(id -> {
+            if (id.asInt() != commentId) {
+                newCommentIds.add(id.asInt());
+            }
+        });
+
+        post.set("comment_ids", newCommentIds);
+        post.put("comment_count", newCommentIds.size());
+
+        objectMapper.writeValue(path.toFile(), root);
+    }
+
     private JsonNode readPostsJson() {
         return objectMapper.readTree(path.toFile());
     }
