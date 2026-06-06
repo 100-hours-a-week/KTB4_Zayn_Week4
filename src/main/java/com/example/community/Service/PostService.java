@@ -2,6 +2,7 @@ package com.example.community.Service;
 
 import com.example.community.dto.PostRequestDTO;
 import com.example.community.repository.PostRepository;
+import com.example.community.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     public int createPostProcess(PostRequestDTO createPostRequestDTO) {
         return postRepository.save(
@@ -67,6 +69,19 @@ public class PostService {
                 postRequestDTO.getPostContent(),
                 postRequestDTO.getPostImage()
         );
+    }
+
+    public void deletePostProcess(int postId) {
+        int userId = getCurrentUserId();
+
+        if (!postRepository.existsByPostId(postId))
+            throw new IllegalArgumentException("post_not_found");
+
+        if (!postRepository.isPostWriter(postId, userId))
+            throw new IllegalArgumentException("post_update_forbidden");
+
+        postRepository.deletePost(postId, userId);
+        userRepository.removeUserPostId(userId, postId);
     }
 
     private int getCurrentUserId() {

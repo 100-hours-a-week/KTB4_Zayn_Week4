@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.nio.file.Path;
@@ -144,6 +145,32 @@ public class UserRepository {
         user.put("user_email", "");
         user.put("user_password", "");
         user.put("user_image", "");
+        objectMapper.writeValue(path.toFile(), root);
+    }
+
+    public void removeUserPostId(int userId, int postId) {
+        ObjectNode root = (ObjectNode) readUsersJson();
+
+        ObjectNode userPosts = (ObjectNode) root
+                .path("users")
+                .path(String.valueOf(userId))
+                .path("user_posts");
+
+        ArrayNode postIds = objectMapper.createArrayNode();
+
+        root.path("users")
+                .path(String.valueOf(userId))
+                .path("user_posts")
+                .path("post_ids")
+                .forEach(id -> {
+                    if (id.asInt() != postId) {
+                        postIds.add(id.asInt());
+                    }
+                });
+
+        userPosts.set("post_ids", postIds);
+        userPosts.put("count", postIds.size());
+
         objectMapper.writeValue(path.toFile(), root);
     }
 

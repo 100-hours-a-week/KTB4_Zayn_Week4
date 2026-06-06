@@ -133,6 +133,14 @@ public class PostRepository {
         objectMapper.writeValue(path.toFile(), root);
     }
 
+    public void deletePost(int postId, int userId) {
+        ObjectNode root = (ObjectNode) readPostsJson();
+        ObjectNode posts = (ObjectNode) root.path("posts");
+
+        posts.remove(String.valueOf(postId));
+        objectMapper.writeValue(path.toFile(), root);
+    }
+
     private JsonNode readPostsJson() {
         return objectMapper.readTree(path.toFile());
     }

@@ -74,8 +74,13 @@ public class PostController { // 게시글 관련 요청 처리
     }
 
     @DeleteMapping("/{post_id}")
-    public ResponseEntity<Map<String, String>> deletePost(@PathVariable("post_id") Long postId) {
-        return null;
+    public ResponseEntity<Map<String, Object>> deletePost(@PathVariable("post_id") int postId) {
+        postService.deletePostProcess(postId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "post_delete_success");
+        response.put("data", null);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{post_id}/edit")
