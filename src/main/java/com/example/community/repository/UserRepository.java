@@ -125,6 +125,16 @@ public class UserRepository {
         objectMapper.writeValue(path.toFile(), root);
     }
 
+    public void setUserPasswordByUserId(int userId, String encodedUserNewPassword) {
+        ObjectNode root = (ObjectNode) readUsersJson();
+        ObjectNode user = (ObjectNode) root
+                .path("users")
+                .path(String.valueOf(userId));
+
+        user.put("user_password", encodedUserNewPassword);
+        objectMapper.writeValue(path.toFile(), root);
+    }
+
     private JsonNode readUsersJson() {
         return objectMapper.readTree(path.toFile());
     }

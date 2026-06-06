@@ -1,6 +1,7 @@
 package com.example.community.Service;
 
 import com.example.community.dto.JoinRequestDTO;
+import com.example.community.dto.UpdatePasswordDTO;
 import com.example.community.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,6 +55,14 @@ public class UserService {
         return response;
     }
 
+    public void updatePasswordProcess(UpdatePasswordDTO updatePasswordDTO) {
+        String userNewPassword = updatePasswordDTO.getUserNewPassword();
+        String userNewPasswordCheck = updatePasswordDTO.getUserNewPassword();
+
+        passwordCheck(userNewPassword, userNewPasswordCheck);
+        updateUserPassword(getCurrentUserId(), passwordEncoding(userNewPassword));
+    }
+
     private void duplicatedCheck(String userEmail, String userNickname) {
         if (userRepository.existsByUserEmail(userEmail)) {
             throw new IllegalArgumentException("duplicated_user_email");
@@ -98,5 +107,9 @@ public class UserService {
     private void updateUserProfile(int userId, String userNewNickname, String userNewImage) {
         userRepository.setUserNicknameByUserId(userId, userNewNickname);
         userRepository.setUserImageByUserId(userId, userNewImage);
+    }
+
+    private void updateUserPassword(int userId, String encodedUserNewPassword) {
+        userRepository.setUserPasswordByUserId(userId, encodedUserNewPassword);
     }
 }

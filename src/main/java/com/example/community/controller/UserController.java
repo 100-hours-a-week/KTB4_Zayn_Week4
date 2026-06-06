@@ -3,6 +3,7 @@ package com.example.community.controller;
 import com.example.community.Service.UserService;
 import com.example.community.domain.User;
 import com.example.community.dto.JoinRequestDTO;
+import com.example.community.dto.UpdatePasswordDTO;
 import com.example.community.dto.UpdateProfileRequestDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -75,8 +76,14 @@ public class UserController { // 사용자 정보 관련 요청 처리
     }
 
     @PatchMapping("/me/password")
-    public ResponseEntity<Map<String, String>> updatePassword() {
-        return null;
+    public ResponseEntity<Map<String, Object>> updatePassword(@RequestBody() UpdatePasswordDTO updatePasswordDTO) {
+        userService.updatePasswordProcess(updatePasswordDTO);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "password_update_success");
+        response.put("data", null);
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/withdraw")
