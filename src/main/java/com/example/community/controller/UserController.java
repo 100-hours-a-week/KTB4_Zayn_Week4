@@ -40,8 +40,14 @@ public class UserController { // 사용자 정보 관련 요청 처리
     }
 
     @GetMapping("/me/profile")
-    public ResponseEntity<Map<String, String>> getProfileEditForm() {
-        return null;
+    public ResponseEntity<Map<String, Object>> getProfileEditForm() {
+        Map<String, Object> userInfo = userService.getUserInfo();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "user_profile_edit_page_load");
+        response.put("data", userInfo);
+
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/me/profile")
