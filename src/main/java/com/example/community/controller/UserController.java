@@ -56,8 +56,12 @@ public class UserController { // 사용자 정보 관련 요청 처리
     }
 
     @GetMapping("/me/password")
-    public ResponseEntity<Map<String, String>> getPasswordEditForm() {
-        return null;
+    public ResponseEntity<Map<String, Object>> getPasswordEditForm() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "user_password_edit_page_load");
+        response.put("data", null);
+
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/me/password")
