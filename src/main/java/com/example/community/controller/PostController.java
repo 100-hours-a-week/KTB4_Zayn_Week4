@@ -3,6 +3,7 @@ package com.example.community.controller;
 import com.example.community.Service.PostService;
 import com.example.community.dto.CreatePostRequestDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,12 +37,16 @@ public class PostController { // 게시글 관련 요청 처리
                 "post_id", postId
         ));
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/new")
-    public ResponseEntity<Map<String, String>> getNewPostForm() {
-        return null;
+    public ResponseEntity<Map<String, Object>> getNewPostForm() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "new_page_load");
+        response.put("data", null);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{post_id}")
