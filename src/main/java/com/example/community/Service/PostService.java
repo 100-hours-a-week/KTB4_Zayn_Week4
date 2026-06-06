@@ -1,6 +1,6 @@
 package com.example.community.Service;
 
-import com.example.community.dto.CreatePostRequestDTO;
+import com.example.community.dto.PostRequestDTO;
 import com.example.community.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,7 +15,7 @@ import java.util.Objects;
 public class PostService {
     private final PostRepository postRepository;
 
-    public int createPostProcess(CreatePostRequestDTO createPostRequestDTO) {
+    public int createPostProcess(PostRequestDTO createPostRequestDTO) {
         return postRepository.save(
                 getCurrentUserId(),
                 createPostRequestDTO.getPostTitle(),
@@ -50,6 +50,23 @@ public class PostService {
             throw new IllegalArgumentException("post_not_found");
 
         return postRepository.getPostByPostId(postId);
+    }
+
+    public void updatePostProcess(int postId, PostRequestDTO postRequestDTO) {
+        int userId = getCurrentUserId();
+
+        if (!postRepository.existsByPostId(postId))
+            throw new IllegalArgumentException("post_not_found");
+
+        if (!postRepository.isPostWriter(postId, userId))
+            throw new IllegalArgumentException("post_update_forbidden");
+
+        postRepository.updatePost(
+                postId,
+                postRequestDTO.getPostTitle(),
+                postRequestDTO.getPostContent(),
+                postRequestDTO.getPostImage()
+        );
     }
 
     private int getCurrentUserId() {

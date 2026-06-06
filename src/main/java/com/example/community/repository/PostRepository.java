@@ -22,7 +22,7 @@ public class PostRepository {
     private final UserRepository userRepository;
 
     public int save(int userId, String title, String content, String postImage) {
-        ObjectNode root = (ObjectNode) readUsersJson();
+        ObjectNode root = (ObjectNode) readPostsJson();
         ObjectNode posts = (ObjectNode) root.path("posts");
 
         int lastPostId = root.path("last_post_id").asInt();
@@ -50,7 +50,7 @@ public class PostRepository {
     }
 
     public List<Map<String, Object>> findAllOrderByLatest() {
-        JsonNode postsNode = readUsersJson().path("posts");
+        JsonNode postsNode = readPostsJson().path("posts");
 
         List<Map<String, Object>> posts = new ArrayList<>();
 
@@ -77,13 +77,13 @@ public class PostRepository {
     }
 
     public boolean existsByPostId(int postId) {
-        return readUsersJson()
+        return readPostsJson()
                 .path("posts")
                 .has(String.valueOf(postId));
     }
 
     public Map<String, Object> getPostByPostId(int postId) {
-        JsonNode post = readUsersJson()
+        JsonNode post = readPostsJson()
                 .path("posts")
                 .path(String.valueOf(postId));
 
@@ -110,7 +110,30 @@ public class PostRepository {
         return result;
     }
 
-    private JsonNode readUsersJson() {
+    public boolean isPostWriter(int postId, int userId) {
+        return readPostsJson()
+                .path("posts")
+                .path(String.valueOf(postId))
+                .path("write_user_id")
+                .asInt() == userId;
+    }
+
+    public void updatePost(int postId, String title, String content, String postImage) {
+        ObjectNode root = (ObjectNode) readPostsJson();
+
+        ObjectNode post = (ObjectNode) root
+                .path("posts")
+                .path(String.valueOf(postId));
+
+        post.put("title", title);
+        post.put("content", content);
+        post.put("post_image", postImage);
+        post.put("updated_at", getCurrentDateTime());
+
+        objectMapper.writeValue(path.toFile(), root);
+    }
+
+    private JsonNode readPostsJson() {
         return objectMapper.readTree(path.toFile());
     }
 

@@ -1,7 +1,8 @@
 package com.example.community.controller;
 
 import com.example.community.Service.PostService;
-import com.example.community.dto.CreatePostRequestDTO;
+import com.example.community.dto.PostRequestDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +29,8 @@ public class PostController { // 게시글 관련 요청 처리
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createPost(@RequestBody CreatePostRequestDTO createPostRequestDTO) {
-        int postId = postService.createPostProcess(createPostRequestDTO);
+    public ResponseEntity<Map<String, Object>> createPost(@Valid @RequestBody PostRequestDTO postRequestDTO) {
+        int postId = postService.createPostProcess(postRequestDTO);
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "posts_page_load");
@@ -61,8 +62,15 @@ public class PostController { // 게시글 관련 요청 처리
     }
 
     @PatchMapping("/{post_id}")
-    public ResponseEntity<Map<String, String>> updatePost(@PathVariable("post_id") Long postId) {
-        return null;
+    public ResponseEntity<Map<String, Object>> updatePost(@PathVariable("post_id") int postId, @Valid @RequestBody PostRequestDTO postRequestDTO) {
+        postService.updatePostProcess(postId, postRequestDTO);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "post_edit_success");
+        response.put("data", Map.of(
+                "post_id", postId
+        ));
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{post_id}")
