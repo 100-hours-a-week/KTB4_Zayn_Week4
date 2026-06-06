@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -39,6 +40,20 @@ public class UserService {
         );
     }
 
+    public Map<String, Object> updateProfileProcess(String userNewNickname, String userNewImage) {
+        int userId = getCurrentUserId();
+
+        validateUserProfileChange(userId, userNewNickname, userNewImage);
+        updateUserProfile(userId, userNewNickname, userNewImage);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("user_id", userId);
+        response.put("user_nickname", userNewNickname);
+        response.put("user_image", userNewImage);
+
+        return response;
+    }
+
     private void duplicatedCheck(String userEmail, String userNickname) {
         if (userRepository.existsByUserEmail(userEmail)) {
             throw new IllegalArgumentException("duplicated_user_email");
@@ -69,5 +84,19 @@ public class UserService {
             return userId;
 
         throw new IllegalArgumentException("invalid_authenticated_user");
+    }
+
+    private void validateUserProfileChange(int userId, String userNewNickname, String userNewImage) {
+        String beforeNickName = userRepository.getUserNicknameByUserId(userId);
+        String beforeImage = userRepository.getUserImageByUserId(userId);
+
+        if (userNewNickname.equals(beforeNickName) && userNewImage.equals(beforeImage)) {
+            throw new IllegalArgumentException("no_user_update_changes");
+        }
+    }
+
+    private void updateUserProfile(int userId, String userNewNickname, String userNewImage) {
+        userRepository.setUserNicknameByUserId(userId, userNewNickname);
+        userRepository.setUserImageByUserId(userId, userNewImage);
     }
 }

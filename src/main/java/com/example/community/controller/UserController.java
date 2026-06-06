@@ -1,8 +1,9 @@
 package com.example.community.controller;
 
 import com.example.community.Service.UserService;
+import com.example.community.domain.User;
 import com.example.community.dto.JoinRequestDTO;
-import jakarta.servlet.http.HttpServletRequest;
+import com.example.community.dto.UpdateProfileRequestDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -51,8 +52,17 @@ public class UserController { // 사용자 정보 관련 요청 처리
     }
 
     @PatchMapping("/me/profile")
-    public ResponseEntity<Map<String, String>> updateProfile() {
-        return null;
+    public ResponseEntity<Map<String, Object>> updateProfile(@RequestBody() UpdateProfileRequestDTO updateProfileRequestDTO) {
+        Map<String, Object> UserInfo = userService.updateProfileProcess(
+                updateProfileRequestDTO.getUserNewNickname(),
+                updateProfileRequestDTO.getUserNewImage()
+        );
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "profile_update_success");
+        response.put("data", UserInfo);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/me/password")
