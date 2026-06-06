@@ -36,8 +36,12 @@ public class AuthController { // 로그인, 로그아웃 관련 요청 처리
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Map<String, String>> tryLogout() {
-        return null;
+    public ResponseEntity<Map<String, Object>> tryLogout() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "delete_token");
+        response.put("data", null);
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/token")
