@@ -2,7 +2,6 @@ package com.example.community.Service;
 
 import com.example.community.dto.CreatePostRequestDTO;
 import com.example.community.repository.PostRepository;
-import com.example.community.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -44,6 +43,13 @@ public class PostService {
                 "page", page,
                 "posts_count", posts.size()
         );
+    }
+
+    public Map<String, Object> getPostProcess(int postId) {
+        if (!postRepository.existsByPostId(postId))
+            throw new IllegalArgumentException("post_not_found");
+
+        return postRepository.getPostByPostId(postId);
     }
 
     private int getCurrentUserId() {

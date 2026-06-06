@@ -50,8 +50,14 @@ public class PostController { // 게시글 관련 요청 처리
     }
 
     @GetMapping("/{post_id}")
-    public ResponseEntity<Map<String, String>> getPost(@PathVariable("post_id") Long postId) {
-        return null;
+    public ResponseEntity<Map<String, Object>> getPost(@PathVariable("post_id") int postId) {
+        Map<String, Object> post = postService.getPostProcess(postId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "post_details_page_load");
+        response.put("data", post);
+
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{post_id}")

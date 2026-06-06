@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,6 +74,40 @@ public class PostRepository {
         );
 
         return posts;
+    }
+
+    public boolean existsByPostId(int postId) {
+        return readUsersJson()
+                .path("posts")
+                .has(String.valueOf(postId));
+    }
+
+    public Map<String, Object> getPostByPostId(int postId) {
+        JsonNode post = readUsersJson()
+                .path("posts")
+                .path(String.valueOf(postId));
+
+        int writeUserId = post.path("write_user_id").asInt();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("post_id", post.path("post_id").asInt());
+        result.put("post_title", post.path("title").asString());
+        result.put("post_content", post.path("content").asString());
+        result.put("post_image", post.path("post_image").asString());
+        result.put("like_count", post.path("like_count").asInt());
+        result.put("comment_count", post.path("comment_count").asInt());
+        result.put("view_count", post.path("view_count").asInt());
+        result.put("writer_nickname", userRepository.getUserNicknameByUserId(writeUserId));
+        result.put("comment_ids", objectMapper.convertValue(
+                post.path("comment_ids"),
+                List.class
+        ));
+        result.put("created_at", post.path("created_at").asString());
+        result.put("updated_at", post.path("updated_at").isNull()
+                ? null
+                : post.path("updated_at").asString());
+
+        return result;
     }
 
     private JsonNode readUsersJson() {
