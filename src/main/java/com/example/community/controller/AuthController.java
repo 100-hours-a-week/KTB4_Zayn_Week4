@@ -1,6 +1,6 @@
 package com.example.community.controller;
 
-import com.example.community.Service.AuthService;
+import com.example.community.service.AuthService;
 import com.example.community.dto.LoginRequestDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

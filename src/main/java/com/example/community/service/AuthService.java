@@ -1,4 +1,4 @@
-package com.example.community.Service;
+package com.example.community.service;
 
 import com.example.community.dto.LoginRequestDTO;
 import com.example.community.repository.UserRepository;

@@ -1,6 +1,6 @@
 package com.example.community.controller;
 
-import com.example.community.Service.PostService;
+import com.example.community.service.PostService;
 import com.example.community.dto.PostRequestDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.example.community.Service;
+package com.example.community.service;
 
 import com.example.community.dto.PostRequestDTO;
 import com.example.community.repository.PostRepository;

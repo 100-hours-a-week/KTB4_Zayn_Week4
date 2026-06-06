@@ -1,6 +1,6 @@
 package com.example.community.controller;
 
-import com.example.community.Service.UserService;
+import com.example.community.service.UserService;
 import com.example.community.dto.JoinRequestDTO;
 import com.example.community.dto.UpdatePasswordDTO;
 import com.example.community.dto.UpdateProfileRequestDTO;

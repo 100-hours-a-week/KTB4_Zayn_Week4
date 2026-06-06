@@ -1,4 +1,4 @@
-package com.example.community.Service;
+package com.example.community.service;
 
 import com.example.community.dto.CommentRequestDTO;
 import com.example.community.repository.CommentRepository;
