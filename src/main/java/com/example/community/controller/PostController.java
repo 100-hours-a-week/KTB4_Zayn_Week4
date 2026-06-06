@@ -84,8 +84,13 @@ public class PostController { // 게시글 관련 요청 처리
     }
 
     @GetMapping("/{post_id}/edit")
-    public ResponseEntity<Map<String, String>> getPostEditForm(@PathVariable("post_id") Long postId) {
-        return null;
+    public ResponseEntity<Map<String, Object>> getPostEditForm(@PathVariable("post_id") int postId) {
+        Map<String, Object> postInfo = postService.getPostInfo(postId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "post_edit_page_load");
+        response.put("data", postInfo);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PatchMapping("/{post_id}/like")

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -82,6 +83,23 @@ public class PostService {
 
         postRepository.deletePost(postId, userId);
         userRepository.removeUserPostId(userId, postId);
+    }
+
+    public Map<String, Object> getPostInfo(int postId) {
+        int userId = getCurrentUserId();
+
+        if (!postRepository.existsByPostId(postId))
+            throw new IllegalArgumentException("post_not_found");
+
+        if (!postRepository.isPostWriter(postId, userId))
+            throw new IllegalArgumentException("post_update_forbidden");
+
+        Map<String, Object> postInfo = new HashMap<>();
+        postInfo.put("post_title", postRepository.getPostTitleByPostId(postId));
+        postInfo.put("post_content", postRepository.getPostContentByPostId(postId));
+        postInfo.put("post_image", postRepository.getPostImageByPostId(postId));
+
+        return postInfo;
     }
 
     private int getCurrentUserId() {

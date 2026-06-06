@@ -141,6 +141,30 @@ public class PostRepository {
         objectMapper.writeValue(path.toFile(), root);
     }
 
+    public String getPostTitleByPostId(int postId) {
+        return readPostsJson()
+                .path("posts")
+                .path(String.valueOf(postId))
+                .path("title")
+                .asString();
+    }
+
+    public String getPostContentByPostId(int postId) {
+        return readPostsJson()
+                .path("posts")
+                .path(String.valueOf(postId))
+                .path("content")
+                .asString();
+    }
+
+    public String getPostImageByPostId(int postId) {
+        return readPostsJson()
+                .path("posts")
+                .path(String.valueOf(postId))
+                .path("post_image")
+                .asString();
+    }
+
     private JsonNode readPostsJson() {
         return objectMapper.readTree(path.toFile());
     }
