@@ -21,23 +21,61 @@ public class AuthFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
             throws IOException, ServletException {
+
         String authorization = request.getHeader("Authorization");
 
-        // JWT토큰이 없는 사용자
-        if (authorization == null || !authorization.startsWith("Bearer ")) { // 추후 문자열 상수 관리
-            setUnauthorizedResponse(response);
+        if (isAuthPageRequest(request)) {
+            handleAuthPageRequest(authorization, request, response, filterChain);
             return;
         }
 
-        String token = authorization.substring(7); // 추후 매직넘버 관리
-
-        // JWT토큰 유효하지 않음
-        if (!tokenProvider.validateAccessToken(token)) {
+        if (!hasValidToken(authorization)) {
             setUnauthorizedResponse(response);
             return;
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isAuthPageRequest(HttpServletRequest request) {
+        String method = request.getMethod();
+        String path = request.getRequestURI();
+
+        return ((method.equals("GET") || method.equals("POST")) // login, join 관련 요청의 경우 true
+                && (path.equals("/login") || path.equals("/join")));
+    }
+
+    private void handleAuthPageRequest(String authorization, HttpServletRequest request,
+                                       HttpServletResponse response, FilterChain filterChain)
+            throws IOException, ServletException {
+        if (hasValidToken(authorization)) { // 유효한 토큰이 있는 경우
+            setAuthorizedResponse(response); // /posts로
+            return;
+        }
+
+        filterChain.doFilter(request, response); // 유효 토큰이 없는 경우, 필터 종료
+    }
+
+    private boolean hasValidToken(String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) { // 추후 문자열 상수 관리
+            return false;
+        }
+
+        String token = authorization.substring(7);
+        return tokenProvider.validateAccessToken(token);
+    }
+
+    private void setAuthorizedResponse(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_OK); // 200
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("""
+                {
+                    "message" : "already_authorized",
+                    "data" : {
+                        "redirect_url" : "/posts"
+                    }
+                }
+                """); // 하드코딩 추후 수정
     }
 
     private void setUnauthorizedResponse(HttpServletResponse response) throws IOException {
@@ -46,7 +84,9 @@ public class AuthFilter extends OncePerRequestFilter {
         response.getWriter().write("""
                 {
                     "message" : "unauthorized",
-                    "data" : null
+                    "data" : {
+                        "redirect_url" : "/login"
+                    }
                 }
                 """); // 하드코딩 추후 수정
     }
