@@ -58,15 +58,16 @@
     "1": {
       "post_id": 1,
       "write_user_id": 1,
-      "title": "제목",
-      "content": "내용",
-      "post_image": "image.png",
-      "created_at": "2026-06-07 00:00:00",
+      "title": "hello world",
+      "content": "hello java spring nice to meet you!",
+      "post_image": "asdsd.png",
+      "created_at": "2026-06-07 06:10:28",
       "updated_at": null,
       "like_count": 0,
+      "like_user_ids": [],
       "view_count": 0,
       "comment_count": 0,
-      "comments_ids": []
+      "comment_ids": []
     }
   }
 }
