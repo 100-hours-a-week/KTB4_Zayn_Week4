@@ -40,6 +40,41 @@ public class CommentRepository {
         return newCommentId;
     }
 
+    public boolean existsByCommentId(int commentId) {
+        return readCommentsJson()
+                .path("comments")
+                .has(String.valueOf(commentId));
+    }
+
+    public boolean isCommentInPost(int commentId, int postId) {
+        return readCommentsJson()
+                .path("comments")
+                .path(String.valueOf(commentId))
+                .path("post_id")
+                .asInt() == postId;
+    }
+
+    public boolean isCommentWriter(int commentId, int userId) {
+        return readCommentsJson()
+                .path("comments")
+                .path(String.valueOf(commentId))
+                .path("write_user_id")
+                .asInt() == userId;
+    }
+
+    public void updateComment(int commentId, String content) {
+        ObjectNode root = (ObjectNode) readCommentsJson();
+
+        ObjectNode comment = (ObjectNode) root
+                .path("comments")
+                .path(String.valueOf(commentId));
+
+        comment.put("content", content);
+        comment.put("updated_at", getCurrentDateTime());
+
+        objectMapper.writeValue(path.toFile(), root);
+    }
+
     private JsonNode readCommentsJson() {
         return objectMapper.readTree(path.toFile());
     }

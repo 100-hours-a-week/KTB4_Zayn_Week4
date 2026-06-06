@@ -35,6 +35,27 @@ public class CommentService {
         return commentId;
     }
 
+    public void editCommentProcess(int postId, int commentId, CommentRequestDTO commentRequestDTO) {
+        int userId = getCurrentUserId();
+
+        if (!postRepository.existsByPostId(postId))
+            throw new IllegalArgumentException("post_not_found");
+
+        if (!commentRepository.existsByCommentId(commentId))
+            throw new IllegalArgumentException("comment_not_found");
+
+        if (!commentRepository.isCommentInPost(commentId, postId))
+            throw new IllegalArgumentException("comment_not_in_post");
+
+        if (!commentRepository.isCommentWriter(commentId, userId))
+            throw new IllegalArgumentException("comment_edit_forbidden");
+
+        commentRepository.updateComment(
+                commentId,
+                commentRequestDTO.getCommentContent()
+        );
+    }
+
     private int getCurrentUserId() {
         Object principal = Objects.requireNonNull(SecurityContextHolder
                         .getContext()

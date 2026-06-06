@@ -29,9 +29,16 @@ public class CommentController { // 댓글 관련 요청 처리
     }
 
     @PatchMapping("/{comment_id}")
-    public ResponseEntity<Map<String, String>> editComment(
-            @PathVariable("post_id") Long postId, @PathVariable("comment_id") Long commentId) {
-        return null;
+    public ResponseEntity<Map<String, Object>> editComment(
+            @PathVariable("post_id") int postId, @PathVariable("comment_id") int commentId,
+            @Valid @RequestBody CommentRequestDTO commentRequestDTO) {
+        commentService.editCommentProcess(postId, commentId, commentRequestDTO);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "comment_edit_success");
+        response.put("data", commentId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{comment_id}")
