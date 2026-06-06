@@ -24,7 +24,7 @@
     "1": {
       "user_id": 1,
       "user_email": "jynoh00@naver.com",
-      "user_pw": "1234",
+      "user_password": "1234",
       "user_nickname": "admin",
       "user_image": "images/test.png",
       "user_posts": {

@@ -44,7 +44,7 @@ public class UserRepository {
         ObjectNode newUser = objectMapper.createObjectNode();
         newUser.put("user_id", newUserId);
         newUser.put("user_email", newUserEmail);
-        newUser.put("user_pw", newUserPassword);
+        newUser.put("user_password", newUserPassword);
         newUser.put("user_nickname", newUserNickname);
         newUser.put("user_image", newUserImage);
 
