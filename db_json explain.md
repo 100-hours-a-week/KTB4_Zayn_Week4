@@ -72,3 +72,30 @@
   }
 }
 ```
+
+`comments.json` 초기 값
+
+```json
+{
+  "last_comment_id": 0,
+  "comments": {}
+}
+```
+
+`comments.json` 예시
+
+```json
+{
+  "last_comment_id": 1,
+  "comments": {
+    "1": {
+      "comment_id": 1,
+      "post_id": 1,
+      "write_user_id": 1,
+      "content": "댓글 내용",
+      "created_at": "2026-06-07 07:00:00",
+      "updated_at": null
+    }
+  }
+}
+```

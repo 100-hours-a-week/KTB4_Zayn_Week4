@@ -174,6 +174,22 @@ public class UserRepository {
         objectMapper.writeValue(path.toFile(), root);
     }
 
+    public void addUserCommentId(int userId, int commentId) {
+        ObjectNode root = (ObjectNode) readUsersJson();
+        ObjectNode userComments = (ObjectNode) root
+                .path("users")
+                .path(String.valueOf(userId))
+                .path("user_comments");
+
+        ArrayNode commentIds = (ArrayNode) userComments.path("comment_ids");
+        commentIds.add(commentId);
+
+        int count = userComments.path("count").asInt() + 1;
+        userComments.put("count", count);
+
+        objectMapper.writeValue(path.toFile(), root);
+    }
+
     private JsonNode readUsersJson() {
         return objectMapper.readTree(path.toFile());
     }

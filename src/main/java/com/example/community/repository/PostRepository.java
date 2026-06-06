@@ -189,6 +189,22 @@ public class PostRepository {
         objectMapper.writeValue(path.toFile(), root);
     }
 
+    public void addCommentId(int postId, int commentId) {
+        ObjectNode root = (ObjectNode) readPostsJson();
+
+        ObjectNode post = (ObjectNode) root
+                .path("posts")
+                .path(String.valueOf(postId));
+
+        ArrayNode commentIds = (ArrayNode) post.path("comment_ids");
+        commentIds.add(commentId);
+
+        int count = post.path("comment_count").asInt() + 1;
+        post.put("comment_count", count);
+
+        objectMapper.writeValue(path.toFile(), root);
+    }
+
     private JsonNode readPostsJson() {
         return objectMapper.readTree(path.toFile());
     }
