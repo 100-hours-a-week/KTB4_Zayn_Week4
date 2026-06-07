@@ -1,8 +1,13 @@
 # REST API 설계 기반 Spring Boot 백엔드 개발 및 요청-응답 확인
 
-## 0. API 설계 기획서
+## 0. API 설계 기획서 및 Postman 요청-응답 확인
 
-https://www.notion.so/RESTful-API-374a99229792802a918ed93752be30b1?source=copy_link
+
+**API 설계 기획서**
+- https://www.notion.so/RESTful-API-374a99229792802a918ed93752be30b1?source=copy_link
+
+**Postman**
+- https://www.notion.so/Postman-API-378a9922979280feb001e5e11ddaba62?source=copy_link
 
 ---
 
@@ -225,6 +230,4 @@ if (!hasValidToken(authorization)) {
 ...
 
 ```
-
----
 
