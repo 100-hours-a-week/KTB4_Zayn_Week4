@@ -1,5 +1,6 @@
 package com.example.community.security;
 
+import com.example.community.common.ResponseFormat;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,14 +11,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class AuthFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -37,34 +41,11 @@ public class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (!hasValidToken(authorization)) {
+        if (!authenticateAccessToken(authorization)) {
             setUnauthorizedResponse(response);
             return;
         }
 
-        // 리팩토링 필수
-        if (!authorization.startsWith("Bearer ")) {
-            setUnauthorizedResponse(response);
-            return;
-        }
-
-        String token = authorization.substring(7);
-
-        if (!tokenProvider.validateAccessToken(token)) {
-            setUnauthorizedResponse(response);
-            return;
-        }
-
-        int userId = tokenProvider.getUserId(token);
-
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(
-                        userId,
-                        null,
-                        Collections.emptyList()
-                );
-
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         filterChain.doFilter(request, response);
     }
 
@@ -79,7 +60,7 @@ public class AuthFilter extends OncePerRequestFilter {
     private void handleAuthPageRequest(String authorization, HttpServletRequest request,
                                        HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
-        if (hasValidToken(authorization)) { // 유효한 토큰이 있는 경우
+        if (authenticateAccessToken(authorization)) { // 유효한 토큰이 있는 경우
             setAuthorizedResponse(response); // /posts로
             return;
         }
@@ -91,38 +72,52 @@ public class AuthFilter extends OncePerRequestFilter {
         return request.getMethod().equals("POST") && request.getRequestURI().equals("/token");
     }
 
-    private boolean hasValidToken(String authorization) {
-        if (authorization == null || !authorization.startsWith("Bearer ")) { // 추후 문자열 상수 관리
-            return false;
-        }
-
-        String token = authorization.substring(7);
-        return tokenProvider.validateAccessToken(token);
-    }
-
     private void setAuthorizedResponse(HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK); // 200
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("""
-                {
-                    "message" : "already_authorized",
-                    "data" : {
-                        "redirect_url" : "/posts"
-                    }
-                }
-                """); // 하드코딩 추후 수정
+
+        ResponseFormat<Map<String, String>> responseBody = ResponseFormat.of(
+                "already_authorized",
+                Map.of("redirect_url", "/posts")
+        );
+
+        response.getWriter().write(objectMapper.writeValueAsString(responseBody));
     }
 
     private void setUnauthorizedResponse(HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("""
-                {
-                    "message" : "unauthorized",
-                    "data" : {
-                        "redirect_url" : "/login"
-                    }
-                }
-                """); // 하드코딩 추후 수정
+
+        ResponseFormat<Map<String, String>> responseBody = ResponseFormat.of(
+                "unauthorized",
+                Map.of("redirect_url", "/login")
+        );
+
+        response.getWriter().write(objectMapper.writeValueAsString(responseBody));
+    }
+
+    private boolean authenticateAccessToken(String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return false;
+        }
+
+        String token = authorization.substring(7);
+
+        if (!tokenProvider.validateAccessToken(token)) {
+            return false;
+        }
+
+        int userId = tokenProvider.getUserId(token);
+
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(
+                        userId,
+                        null,
+                        Collections.emptyList()
+                );
+
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        return true;
     }
 }
