@@ -1,5 +1,6 @@
 package com.example.community.controller;
 
+import com.example.community.common.ResponseFormat;
 import com.example.community.service.CommentService;
 import com.example.community.dto.CommentRequestDTO;
 import jakarta.validation.Valid;
@@ -8,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -18,38 +18,32 @@ public class CommentController { // 댓글 관련 요청 처리
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> writeComment(@PathVariable("post_id") int postId, @Valid @RequestBody() CommentRequestDTO commentRequestDTO) {
+    public ResponseEntity<?> writeComment(@PathVariable("post_id") int postId, @Valid @RequestBody() CommentRequestDTO commentRequestDTO) {
         int commentId = commentService.createCommentProcess(postId, commentRequestDTO);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "write_comment_success");
-        response.put("data", commentId);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ResponseFormat.of("write_comment_success",
+                        Map.of("comment_id", commentId)
+                )
+        );
     }
 
     @PatchMapping("/{comment_id}")
-    public ResponseEntity<Map<String, Object>> editComment(
+    public ResponseEntity<?> editComment(
             @PathVariable("post_id") int postId, @PathVariable("comment_id") int commentId,
             @Valid @RequestBody CommentRequestDTO commentRequestDTO) {
         commentService.editCommentProcess(postId, commentId, commentRequestDTO);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "comment_edit_success");
-        response.put("data", commentId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(
+                ResponseFormat.of("comment_edit_success",
+                        Map.of("comment_id", commentId)
+                )
+        );
     }
 
     @DeleteMapping("/{comment_id}")
-    public ResponseEntity<Map<String, Object>> deleteComment(
+    public ResponseEntity<?> deleteComment(
             @PathVariable("post_id") int postId, @PathVariable("comment_id") int commentId) {
         commentService.deleteCommentProcess(postId, commentId);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "comment_delete_success");
-        response.put("data", null);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(ResponseFormat.of("comment_delete_success"));
     }
 }

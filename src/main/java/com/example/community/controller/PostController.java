@@ -1,5 +1,6 @@
 package com.example.community.controller;
 
+import com.example.community.common.ResponseFormat;
 import com.example.community.service.PostService;
 import com.example.community.dto.PostRequestDTO;
 import jakarta.validation.Valid;
@@ -8,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -18,91 +18,68 @@ public class PostController { // 게시글 관련 요청 처리
     private final PostService postService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getPosts(@RequestParam(defaultValue = "1") int page) {
+    public ResponseEntity<?> getPosts(@RequestParam(defaultValue = "1") int page) {
         Map<String, Object> pageInfo = postService.postsPageLoadProcess(page);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "posts_page_load");
-        response.put("data", pageInfo);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ResponseFormat.of("posts_page_load", pageInfo));
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createPost(@Valid @RequestBody PostRequestDTO postRequestDTO) {
+    public ResponseEntity<?> createPost(@Valid @RequestBody PostRequestDTO postRequestDTO) {
         int postId = postService.createPostProcess(postRequestDTO);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "posts_page_load");
-        response.put("data", Map.of(
-                "post_id", postId
-        ));
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ResponseFormat.of("post_page_load",
+                        Map.of(
+                                "post_id", postId
+                        ))
+        );
     }
 
     @GetMapping("/new")
-    public ResponseEntity<Map<String, Object>> getNewPostForm() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "new_page_load");
-        response.put("data", null);
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> getNewPostForm() {
+        return ResponseEntity.ok(ResponseFormat.of("new_page_load"));
     }
 
     @GetMapping("/{post_id}")
-    public ResponseEntity<Map<String, Object>> getPost(@PathVariable("post_id") int postId) {
+    public ResponseEntity<?> getPost(@PathVariable("post_id") int postId) {
         Map<String, Object> post = postService.getPostProcess(postId);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "post_details_page_load");
-        response.put("data", post);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ResponseFormat.of("post_details_page_load", post));
     }
 
     @PatchMapping("/{post_id}")
-    public ResponseEntity<Map<String, Object>> updatePost(@PathVariable("post_id") int postId, @Valid @RequestBody PostRequestDTO postRequestDTO) {
+    public ResponseEntity<?> updatePost(@PathVariable("post_id") int postId, @Valid @RequestBody PostRequestDTO postRequestDTO) {
         postService.updatePostProcess(postId, postRequestDTO);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "post_edit_success");
-        response.put("data", Map.of(
-                "post_id", postId
-        ));
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(ResponseFormat.of("post_edit_success",
+                Map.of(
+                        "post_id", postId
+                ))
+        );
     }
 
     @DeleteMapping("/{post_id}")
-    public ResponseEntity<Map<String, Object>> deletePost(@PathVariable("post_id") int postId) {
+    public ResponseEntity<?> deletePost(@PathVariable("post_id") int postId) {
         postService.deletePostProcess(postId);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "post_delete_success");
-        response.put("data", null);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(ResponseFormat.of("post_delete_success"));
     }
 
     @GetMapping("/{post_id}/edit")
-    public ResponseEntity<Map<String, Object>> getPostEditForm(@PathVariable("post_id") int postId) {
+    public ResponseEntity<?> getPostEditForm(@PathVariable("post_id") int postId) {
         Map<String, Object> postInfo = postService.getPostInfo(postId);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "post_edit_page_load");
-        response.put("data", postInfo);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(ResponseFormat.of("post_edit_page_load", postInfo));
     }
 
     @PatchMapping("/{post_id}/like")
-    public ResponseEntity<Map<String, Object>> addLike(@PathVariable("post_id") int postId) {
+    public ResponseEntity<?> addLike(@PathVariable("post_id") int postId) {
         postService.addLikeProcess(postId);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "like_update_success");
-        response.put("data", Map.of(
-                "liked", true,
-                "like_count", 1
-        ));
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(ResponseFormat.of("like_update_success",
+                Map.of(
+                        "liked", true,
+                        "like_count", 1
+                )));
     }
 }

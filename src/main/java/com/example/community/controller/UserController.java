@@ -1,5 +1,6 @@
 package com.example.community.controller;
 
+import com.example.community.common.ResponseFormat;
 import com.example.community.service.UserService;
 import com.example.community.dto.JoinRequestDTO;
 import com.example.community.dto.UpdatePasswordDTO;
@@ -10,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -19,80 +19,52 @@ public class UserController { // 사용자 정보 관련 요청 처리
     private final UserService userService;
 
     @GetMapping("/join")
-    public ResponseEntity<Map<String, Object>> getJoinForm() {
-        Map<String, Object> response = new HashMap<>(); // 추후 응답 관련 클래스 따로 만들기
-        response.put("message", "join_page_load");
-        response.put("data", null);
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> getJoinForm() {
+        return ResponseEntity.ok(ResponseFormat.of("join_page_load"));
     }
 
     @PostMapping("/join")
-    public ResponseEntity<Map<String, Object>> tryJoin(@Valid @RequestBody JoinRequestDTO joinRequestDTO) {
-        Integer userId = userService.joinProcess(joinRequestDTO);
+    public ResponseEntity<?> tryJoin(@Valid @RequestBody JoinRequestDTO joinRequestDTO) {
+        int userId = userService.joinProcess(joinRequestDTO);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "join_success");
-        response.put("data", Map.of(
-                "user_id", userId
-        ));
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ResponseFormat.of("join_success",
+                        Map.of(
+                                "user_id", userId
+                        ))
+        );
     }
 
     @GetMapping("/me/profile")
-    public ResponseEntity<Map<String, Object>> getProfileEditForm() {
+    public ResponseEntity<?> getProfileEditForm() {
         Map<String, Object> userInfo = userService.getUserInfo();
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "user_profile_edit_page_load");
-        response.put("data", userInfo);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ResponseFormat.of("user_profile_edit_page_load", userInfo));
     }
 
     @PatchMapping("/me/profile")
-    public ResponseEntity<Map<String, Object>> updateProfile(@Valid @RequestBody() UpdateProfileRequestDTO updateProfileRequestDTO) {
-        Map<String, Object> UserInfo = userService.updateProfileProcess(
+    public ResponseEntity<?> updateProfile(@Valid @RequestBody() UpdateProfileRequestDTO updateProfileRequestDTO) {
+        Map<String, Object> userInfo = userService.updateProfileProcess(
                 updateProfileRequestDTO.getUserNewNickname(),
                 updateProfileRequestDTO.getUserNewImage()
         );
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "profile_update_success");
-        response.put("data", UserInfo);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ResponseFormat.of("profile_update_success", userInfo));
     }
 
     @GetMapping("/me/password")
-    public ResponseEntity<Map<String, Object>> getPasswordEditForm() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "user_password_edit_page_load");
-        response.put("data", null);
-
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> getPasswordEditForm() {
+        return ResponseEntity.ok(ResponseFormat.of("user_password_edit_page_load"));
     }
 
     @PatchMapping("/me/password")
-    public ResponseEntity<Map<String, Object>> updatePassword(@Valid @RequestBody() UpdatePasswordDTO updatePasswordDTO) {
+    public ResponseEntity<?> updatePassword(@Valid @RequestBody() UpdatePasswordDTO updatePasswordDTO) {
         userService.updatePasswordProcess(updatePasswordDTO);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "password_update_success");
-        response.put("data", null);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ResponseFormat.of("password_update_success"));
     }
 
     @DeleteMapping("/withdraw")
-    public ResponseEntity<Map<String, Object>> tryWithdraw() {
+    public ResponseEntity<?> tryWithdraw() {
         userService.withdrawProcess();
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "user_delete_success");
-        response.put("data", null);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ResponseFormat.of("user_delete_success"));
     }
 }
