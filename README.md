@@ -231,3 +231,44 @@ if (!hasValidToken(authorization)) {
 
 ```
 
+<br/>
+
+### 1-7) Spring Security, LogoutFilter
+
+`POST /logout` 요청에 대한 응답이 예상과 다르게 다음과 같은 JSON을 형성하였습니다.
+
+```java
+{
+    "data": {
+        "redirect_url": "/posts"
+    },
+    "message": "already_authorized"
+}
+```
+이에 대해 찾아보니
+Spring Security의 LogoutFilter라는게 있는데, 해당 필터는 `/logut` 요청을 특별하게 보고<br/>
+동작 방식으로는 세션 기반 로그인에서 유효하게 기능한다는 것을 알게되었습니다.
+
+즉 `AuthFilter`를 거친 후 응답이 컨트롤러로 이어져 기존에 작성한 메서드였던
+
+```java
+@PostMapping("/logout")
+public ResponseEntity<?> tryLogout() {
+    return ResponseEntity.ok(ResponseFormat.of("logout_success"));
+}
+```
+
+`tryLogout()`의 응답 결과가 반환되는게 의도 처리였으나,<br/>
+컨트롤러로 위임되기 전에 `SpringSecurity`의 `LogoutFilter`가 이를 처리하는 것이었습니다.
+
+따라서 `SecurityConfig` 내부 필터체인 설정에서 다음을 추가하여
+
+
+```java
+.logout(AbstractHttpConfigurer::disable)
+```
+
+Spring Security의 `/logout` 요청을 가로채지 못하게 해, 컨트롤러에서 해당 요청을 처리하게 하였습니다.
+
+<br/>
+
