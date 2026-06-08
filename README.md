@@ -19,7 +19,7 @@
 
 ---
 
-## <a id="api-docs"></a> 0. API 설계 기획서 및 Postman 요청-응답 확인
+## <a id="api-docs"></a> 0. 관련 링크
 
 
 **API 설계 기획서**
@@ -27,6 +27,9 @@
 
 **Postman**
 - https://www.notion.so/Postman-API-378a9922979280feb001e5e11ddaba62?source=copy_link
+
+**json db 파일 생성 예시**
+- https://github.com/100-hours-a-week/KTB4_Zayn_Week4/blob/main/db_json%20explain.md
 
 ---
 
